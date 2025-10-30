@@ -7,8 +7,9 @@
 ## 📊 Overview
 
 - **Tests strictly following 42 subject requirements**
-- **6 specialized test files** (5 mandatory + 1 optional defensive)
+- **Individual test files per function** + integration tests
 - **Valgrind** + **AddressSanitizer/UBSan**
+- **Progress tracking**: `[TEST X] test_name` - know exactly which test crashes!
 - **Separate optional defensive coding tests** (test_defensive_null.c)
 
 ### 🛡️ About Defensive Coding Tests
@@ -47,77 +48,70 @@ A separate test file (`test_defensive_null.c`) checks NULL parameter handling:
 
 ## 📁 Test Structure
 
-### 1. **test_edge_cases.c**
-Tests for edge cases following the subject requirements.
+### ✨ Individual Function Tests
+Each function has its own test file (e.g., `test_atoi.c`, `test_substr.c`, etc.) containing:
+- **Basic tests** - Standard functionality
+- **Edge cases** - Boundary conditions (empty, zero, overflow)
+- **Sneaky tests** - Common bugs (special chars, overflow, underflow)
+- **Ultra-sneaky tests** - Expert edge cases (UINT_MAX, negative bytes)
 
-#### Included tests:
-- **ft_atoi**: Overflow behavior (matches libc), complete whitespace, multiple signs
-- **ft_substr**: Start > strlen, len > strlen, empty strings
-- **ft_split**: Multiple delimiters, empty string, single word
-- **ft_strjoin**: Empty strings
-- **ft_strtrim**: Complete trim, empty set, special characters
-- **ft_strlcat**: Full buffer, dstsize = 0, dstsize < strlen(dst)
-- **ft_strnstr**: Empty needle, len = 0, needle at boundary
-- **ft_memchr**: Search '\0', after null, n = 0
-- **ft_calloc**: Zero size behavior (returns valid pointer for free)
-- **ft_itoa**: INT_MIN, INT_MAX, 0
+**All tests display**: `[TEST X] test_name` so you know exactly which test crashes!
 
-**Note**: Overflow protection tests removed (not required by subject).
+### 📂 Integration Tests
 
----
+#### 1. **test_fd_edge_cases.c**
+File descriptor integration tests:
+- **Invalid FDs**: -1, 9999, closed FD
+- **Content verification**: Writing to temporary file
+- **Empty strings**: ft_putnbr_fd with 0, -1, INT_MIN, INT_MAX
 
-### 2. **test_fd_edge_cases.c**
-Tests for writing functions with file descriptors.
+#### 2. **test_list_torture.c** (bonus)
+Linked list torture tests:
+- **Memory management**: Proper allocation/deallocation
+- **Edge cases**: Empty lists, single node, NULL content
+- **lstmap failures**: Allocation failure in middle of mapping
 
-#### Included tests:
-- **Invalid FDs** : -1, 9999, closed FD
-- **Content verification** : Writing to temporary file
-- **Empty strings** : "", ft_putnbr_fd with 0, -1, INT_MIN, INT_MAX
-
-**Note**: NULL tests moved to test_defensive_null.c
-
----
-
-### 3. **test_sneaky_bugs.c**
-Tests for classic bugs that often break projects.
-
-#### Included tests:
-- **ft_strlcpy** : dstsize = 0, dstsize = 1, returns strlen(src)
-- **ft_strlcat** : dst not null-terminated, dstsize <= strlen(dst)
-- **ft_split** : Allocation failure, very long word, delimiter '\0'
-- **ft_substr** : start + len > strlen, start = UINT_MAX
-- **ft_strjoin** : Empty strings
-- **ft_strtrim** : Trim everything, empty set
-- **ft_atoi** : Complete whitespace, multiple signs, trailing garbage
-- **ft_memcpy/memmove** : Overlap forward/backward, n = 0
-- **ft_strncmp** : Unsigned char comparison, n = 0
-- **ft_strnstr** : Needle at boundary, empty needle
-- **ft_strchr/strrchr** : Search '\0', negative character
-- **ft_memchr** : After null, negative character, n = 0
-- **ft_memcmp** : Unsigned comparison, n = 0, after null
-- **ft_itoa** : INT_MIN, INT_MAX, 0
-- **ft_calloc** : calloc(0, 0)
-- **ft_strdup** : Empty string
-
-**Note**: NULL tests moved to test_defensive_null.c
+#### 3. **test_defensive_null.c** (optional)
+Optional NULL parameter handling tests:
+- **Not required by subject** - undefined behavior is allowed
+- **Good practice** - shows defensive programming
+- **Runs separately** - without Valgrind/ASan
+- **Progress tracking**: Shows which test crashes
 
 ---
 
-### 4. **test_ultra_sneaky.c** (62 tests)
-Ultra-sneaky tests expert level.
+## 🔍 Debug Features
 
-#### Included tests:
-- **ft_atoi** : All types of whitespace, silent overflow, multiple signs
-- **ft_split** : Delimiter '\0', 100 delimiters consecutive, single character
-- **ft_substr** : start = UINT_MAX, len very large, overflow
-- **ft_strjoin** : Medium strings (500 characters), content verification
-- **ft_strtrim** : Set contains all characters, very long set, special characters
-- **ft_strlcpy** : dstsize = 0/1, empty source
-- **ft_strlcat** : dst not null-terminated, dstsize < dst_len
-- **ft_strchr/strrchr** : '\0', multiple occurrences, negative character
-- **ft_strncmp** : Unsigned comparison, n = 0, embedded null
-- **ft_strnstr** : Empty needle, needle > len, multiple occurrences
-- **ft_memchr** : After null, negative character, n = 0
+When a test crashes, you see:
+```
+[TEST 42] calloc(0, 10) returns non-NULL
+✗ test_atoi (floating point exception - division by zero?)
+  → Crashed during: [TEST 15] atoi overflow behavior
+  → Debug with: gdb tests/run_test_atoi_valgrind (type 'run' then 'backtrace')
+```
+
+**You know exactly**:
+- Which test number crashed
+- What the test was checking
+- How to debug it with gdb
+
+---
+
+## 📊 Test Coverage
+
+### Individual Function Tests (~200+ tests)
+Each function (atoi, substr, split, strjoin, strtrim, etc.) has:
+- **Basic functionality** - 2-5 tests
+- **Edge cases** - 3-8 tests
+- **Sneaky bugs** - 2-5 tests
+- **Ultra-sneaky** - 3-10 tests
+
+**Examples**:
+- **ft_atoi**: 25+ tests (overflow, underflow, whitespace, signs, trailing)
+- **ft_split**: 12+ tests (empty, delimiters, long word, 100 delimiters)
+- **ft_substr**: 12+ tests (empty, UINT_MAX, very large len)
+- **ft_strlcpy/strlcat**: 13+ tests each (dstsize=0/1, non null-terminated)
+- **ft_memchr/memcmp**: 13+ tests (after null, negative bytes, n=0)
 - **ft_memcmp** : Unsigned, n = 0, after null
 - **ft_memcpy/memmove** : n = 0, same pointer
 - **ft_itoa** : INT_MIN, INT_MAX, multiple digits

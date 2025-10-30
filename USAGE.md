@@ -17,6 +17,7 @@ chmod +x alnok.sh
 ```
 
 **Excludes**: `test_list_torture.c` (linked list tests)
+**Includes**: All individual function tests + integration tests
 
 ### Complete test with bonus
 ```bash
@@ -29,10 +30,13 @@ chmod +x alnok.sh
 
 1. ✅ **Build**: `make fclean` → `make` → `make bonus`
 2. ✅ **Verification**: No global variables
-3. ✅ **Valgrind Phase**: Memory leak detection
-4. ✅ **ASan/UBSan Phase**: Memory error detection
-5. ✅ **Cleanup**: Removes test binaries
-6. ✅ **Final fclean**: Automatic `make fclean`
+3. ✅ **Valgrind Phase**: Memory leak detection (all individual tests)
+4. ✅ **ASan/UBSan Phase**: Memory error detection (all individual tests)
+5. ✅ **Defensive NULL tests**: Optional NULL handling (separate, no Valgrind/ASan)
+6. ✅ **Cleanup**: Removes test binaries
+7. ✅ **Final fclean**: Automatic `make fclean`
+
+**Progress tracking**: Each test displays `[TEST X] test_name` so you know exactly which test is running!
 
 ## Exit Codes
 
@@ -49,12 +53,20 @@ chmod +x alnok.sh
 === ✅ ALL TESTS PASSED ===
 ```
 
-### ❌ Failure
+### ❌ Failure with detailed info
 ```
-❌ Valgrind FAIL: test_edge_cases
-❌ ASan FAIL: test_sneaky_bugs
+[TEST 15] atoi overflow behavior
+✗ test_atoi (floating point exception - division by zero?)
+  → Crashed during: [TEST 15] atoi overflow behavior
+  → Debug with: gdb tests/run_test_atoi_valgrind (type 'run' then 'backtrace')
+
 === ❌ SOME TESTS FAILED ===
 ```
+
+**You see exactly**:
+- Which test number crashed (TEST 15)
+- What was being tested (atoi overflow behavior)
+- How to debug it (gdb command provided)
 
 ## Dependencies
 
@@ -64,9 +76,10 @@ chmod +x alnok.sh
 
 ## Tips
 
-### Test a single file
+### Test a single function
 ```bash
-cc -g -Wall -Wextra -Werror tests/test_edge_cases.c libft.a -o test && ./test
+# Test only ft_atoi
+cc -g -Wall -Wextra -Werror tests/test_atoi.c libft.a -o test && ./test
 ```
 
 ### With manual Valgrind
@@ -76,7 +89,23 @@ valgrind --leak-check=full ./test
 
 ### With manual ASan
 ```bash
-cc -g -fsanitize=address tests/test_edge_cases.c libft.a -o test && ./test
+cc -g -fsanitize=address tests/test_atoi.c libft.a -o test && ./test
+```
+
+### Debug a crash with gdb
+When you see a crash message like:
+```
+✗ test_atoi (floating point exception)
+  → Crashed during: [TEST 15] atoi overflow behavior
+  → Debug with: gdb tests/run_test_atoi_valgrind
+```
+
+Run the gdb command:
+```bash
+gdb tests/run_test_atoi_valgrind
+(gdb) run
+(gdb) backtrace  # See where it crashed
+(gdb) list        # See the code
 ```
 
 ## File Structure
