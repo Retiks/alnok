@@ -92,21 +92,7 @@ int main(void)
     TEST("strjoin empty+empty", s && strcmp(s, "") == 0);
     free(s);
     
-    // ========== ft_strjoin: NULL tests (defensive coding - optional) ==========
-    // Note: Subject doesn't require NULL handling, but it's good practice.
-    // These tests are OPTIONAL - passing NULL is undefined behavior.
-    
-    s = ft_strjoin(NULL, "test");
-    TEST("strjoin NULL+string returns NULL (defensive)", s == NULL);
-    if (s) free(s);
-    
-    s = ft_strjoin("test", NULL);
-    TEST("strjoin string+NULL returns NULL (defensive)", s == NULL);
-    if (s) free(s);
-    
-    s = ft_strjoin(NULL, NULL);
-    TEST("strjoin NULL+NULL returns NULL (defensive)", s == NULL);
-    if (s) free(s);
+    // Note: NULL tests moved to test_defensive_null.c
     
     // ========== ft_strtrim: Trim all and NULL ==========
     s = ft_strtrim("   ", " ");
@@ -120,18 +106,6 @@ int main(void)
     s = ft_strtrim("xxxHELLOxxx", "x");
     TEST("strtrim both sides", s && strcmp(s, "HELLO") == 0);
     free(s);
-    
-    // ========== ft_strtrim: NULL tests (defensive coding - optional) ==========
-    // Note: Subject doesn't require NULL handling, but it's good practice.
-    // These tests are OPTIONAL - passing NULL is undefined behavior.
-    
-    s = ft_strtrim(NULL, "abc");
-    TEST("strtrim NULL+set returns NULL (defensive)", s == NULL);
-    if (s) free(s);
-    
-    s = ft_strtrim("test", NULL);
-    TEST("strtrim string+NULL returns NULL (defensive)", s == NULL);
-    if (s) free(s);
     
     // ========== ft_atoi: Whitespace and signs ==========
     TEST("atoi multiple spaces", ft_atoi("   \t\n\r\v\f  42") == 42);
@@ -182,17 +156,6 @@ int main(void)
     s = ft_itoa(0);
     TEST("itoa zero", s && strcmp(s, "0") == 0);
     free(s);
-    
-    // ========== ft_strmapi/striteri: NULL tests (defensive coding - optional) ==========
-    // Note: Subject doesn't require NULL handling, but it's good practice.
-    // These tests are OPTIONAL - passing NULL is undefined behavior.
-    
-    char *mapped = ft_strmapi("test", NULL);
-    TEST("strmapi with NULL function returns NULL (defensive)", mapped == NULL);
-    if (mapped) free(mapped);
-    
-    ft_striteri(NULL, NULL);
-    TEST("striteri with NULL doesn't crash (defensive)", 1);
     
     // ========== ft_calloc: Zero size ==========
     void *p;

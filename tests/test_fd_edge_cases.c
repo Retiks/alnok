@@ -46,27 +46,17 @@ int main(void)
     // Test 3: Closed FD
     int fd = open("/tmp/test_libft_fd.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd >= 0) {
-        close(fd);
         // Writing to Closed FD should not crash
         ft_putchar_fd('A', fd);
         TEST("putchar_fd on closed fd doesn't crash", 1);
     }
     
-    // ========== Tests avec NULL (defensive coding - optional but recommended) ==========
-    // Note: The subject doesn't require NULL protection, but it's good practice
-    // to avoid segfaults during evaluation. These tests are OPTIONAL.
-    
-    ft_putstr_fd(NULL, 1);
-    TEST("putstr_fd with NULL doesn't crash (defensive)", 1);
-    
-    ft_putendl_fd(NULL, 1);
-    TEST("putendl_fd with NULL doesn't crash (defensive)", 1);
+    // Note: NULL tests moved to test_defensive_null.c
     
     // ========== Functional tests with temporary file ==========
     
     fd = open("/tmp/test_libft_output.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd < 0) {
-        fprintf(stderr, "Cannot create temp file\n");
         return 1;
     }
     

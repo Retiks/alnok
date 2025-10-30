@@ -72,12 +72,18 @@ fi
 
 shopt -s nullglob
 if [ ${TEST_BONUS} -eq 1 ]; then
-  TEST_FILES=(${TEST_DIR}/test_*.c)
-else
-  # Exclude bonus tests (list_torture)
+  # Include all tests except defensive_null
   TEST_FILES=()
   for f in ${TEST_DIR}/test_*.c; do
-    if [[ ! "$(basename "$f")" =~ list_torture ]]; then
+    if [[ ! "$(basename "$f")" =~ defensive_null ]]; then
+      TEST_FILES+=("$f")
+    fi
+  done
+else
+  # Exclude bonus tests (list_torture) and defensive_null
+  TEST_FILES=()
+  for f in ${TEST_DIR}/test_*.c; do
+    if [[ ! "$(basename "$f")" =~ list_torture ]] && [[ ! "$(basename "$f")" =~ defensive_null ]]; then
       TEST_FILES+=("$f")
     fi
   done
@@ -143,12 +149,38 @@ for SRC in "${TEST_FILES[@]}"; do
 done
 
 echo
-echo "=== [6] Cleaning test binaries ==="
+echo "=== [6] Defensive NULL tests (optional - no Valgrind/ASan) ==="
+echo -e "${YELLOW}⚠️  Testing NULL parameter handling (optional defensive coding)${NC}"
+echo -e "${YELLOW}   These tests are NOT required by 42 subject${NC}"
+echo
+
+DEFENSIVE_SRC="${TEST_DIR}/test_defensive_null.c"
+DEFENSIVE_BIN="${TEST_DIR}/run_test_defensive_null"
+
+if [ -f "${DEFENSIVE_SRC}" ]; then
+  echo "--- Compiling defensive NULL test ---"
+  if ${CC} ${CFLAGS_BASE} "${DEFENSIVE_SRC}" "${LIB}" -o "${DEFENSIVE_BIN}" 2>/dev/null; then
+    echo "✅ Compiled defensive test"
+    echo "--- Running defensive NULL test (may segfault if NULL not handled) ---"
+    if "${DEFENSIVE_BIN}"; then
+      echo "✅ Defensive test completed"
+    else
+      echo -e "${YELLOW}⚠️  Defensive test had failures (this is OK - not required)${NC}"
+    fi
+  else
+    echo "❌ Compilation failed for defensive test"
+  fi
+else
+  echo "ℹ️  Defensive NULL test not found (optional)"
+fi
+
+echo
+echo "=== [7] Cleaning test binaries ==="
 rm -f "${TEST_DIR}"/run_test_*
 echo "✅ Test binaries cleaned"
 
 echo
-echo "=== [7] Cleaning project (make fclean) ==="
+echo "=== [8] Cleaning project (make fclean) ==="
 make fclean >/dev/null 2>&1 || true
 echo "✅ Project cleaned"
 

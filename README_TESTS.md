@@ -7,17 +7,18 @@
 ## 📊 Overview
 
 - **Tests strictly following 42 subject requirements**
-- **5 specialized test files**
+- **6 specialized test files** (5 mandatory + 1 optional defensive)
 - **Valgrind** + **AddressSanitizer/UBSan**
-- **Includes optional defensive coding tests** (clearly marked)
+- **Separate optional defensive coding tests** (test_defensive_null.c)
 
 ### 🛡️ About Defensive Coding Tests
 
-Some tests check for NULL parameter handling and overflow protection. These are marked as **"defensive coding - optional"** because:
+A separate test file (`test_defensive_null.c`) checks NULL parameter handling:
 
 - ✅ **Not required by subject** - Passing NULL is undefined behavior
 - ✅ **Good practice** - Prevents segfaults during evaluation
-- ✅ **Recommended but optional** - Won't cause a 0 if not implemented
+- ✅ **Runs separately** - Not executed with Valgrind/ASan (would crash)
+- ✅ **Optional** - Won't cause a 0 if not implemented
 - ⚠️ **Subject rule**: "except for undefined behavior" - so segfaults on NULL are technically allowed
 
 **Our recommendation**: Implement these protections (they're just 1-2 lines) to show good coding practices.
@@ -61,7 +62,7 @@ Tests for edge cases following the subject requirements.
 - **ft_calloc**: Zero size behavior (returns valid pointer for free)
 - **ft_itoa**: INT_MIN, INT_MAX, 0
 
-**Note**: Overflow protection tests removed (not required). NULL tests included as optional defensive coding.
+**Note**: Overflow protection tests removed (not required by subject).
 
 ---
 
@@ -72,11 +73,12 @@ Tests for writing functions with file descriptors.
 - **Invalid FDs** : -1, 9999, closed FD
 - **Content verification** : Writing to temporary file
 - **Empty strings** : "", ft_putnbr_fd with 0, -1, INT_MIN, INT_MAX
-- **NULL tests** : ft_putstr_fd(NULL), ft_putendl_fd(NULL) - marked as optional defensive coding
+
+**Note**: NULL tests moved to test_defensive_null.c
 
 ---
 
-### 3. **test_sneaky_bugs.c** (51 tests)
+### 3. **test_sneaky_bugs.c**
 Tests for classic bugs that often break projects.
 
 #### Included tests:
@@ -84,8 +86,8 @@ Tests for classic bugs that often break projects.
 - **ft_strlcat** : dst not null-terminated, dstsize <= strlen(dst)
 - **ft_split** : Allocation failure, very long word, delimiter '\0'
 - **ft_substr** : start + len > strlen, start = UINT_MAX
-- **ft_strjoin** : NULL + string, string + NULL, NULL + NULL
-- **ft_strtrim** : Trim everything, NULL + set, string + NULL
+- **ft_strjoin** : Empty strings
+- **ft_strtrim** : Trim everything, empty set
 - **ft_atoi** : Complete whitespace, multiple signs, trailing garbage
 - **ft_memcpy/memmove** : Overlap forward/backward, n = 0
 - **ft_strncmp** : Unsigned char comparison, n = 0
@@ -94,8 +96,10 @@ Tests for classic bugs that often break projects.
 - **ft_memchr** : After null, negative character, n = 0
 - **ft_memcmp** : Unsigned comparison, n = 0, after null
 - **ft_itoa** : INT_MIN, INT_MAX, 0
-- **ft_calloc** : calloc(0, 0), overflow detection
-- **ft_strdup** : Empty string, long string
+- **ft_calloc** : calloc(0, 0)
+- **ft_strdup** : Empty string
+
+**Note**: NULL tests moved to test_defensive_null.c
 
 ---
 
@@ -141,6 +145,25 @@ Torture tests for linked lists.
 
 ---
 
+### 6. **test_defensive_null.c** 🛡️ OPTIONAL
+Optional defensive coding tests for NULL parameter handling.
+
+**⚠️ Important**: This test runs separately without Valgrind/ASan (would crash).
+
+#### Included tests:
+- **ft_strjoin** : NULL + string, string + NULL, NULL + NULL
+- **ft_strtrim** : NULL + set, string + NULL, NULL + NULL
+- **ft_substr** : NULL string
+- **ft_split** : NULL string
+- **ft_strmapi** : NULL string, NULL function
+- **ft_striteri** : NULL string, NULL function
+- **ft_putstr_fd** : NULL string
+- **ft_putendl_fd** : NULL string
+
+**Note**: These tests are NOT required by the 42 subject. They check if your functions handle NULL gracefully instead of segfaulting. Implementing NULL checks is good practice but optional.
+
+---
+
 ## 🛡️ Detection Tools
 
 ### Valgrind
@@ -165,12 +188,14 @@ Torture tests for linked lists.
 
 | Category | Number of tests |
 |-----------|----------------|
-| Edge cases | 46 |
-| File descriptors | 13 |
-| Classic bugs | 51 |
-| Expert tests | 62 |
+| Edge cases | 43 |
+| File descriptors | 11 |
+| Classic bugs | 43 |
+| Expert tests | 60 |
 | Linked lists (bonus) | 37 |
-| **TOTAL** | **209** |
+| **Mandatory TOTAL** | **157** |
+| Defensive NULL (optional) | ~15 |
+| **TOTAL with optional** | **~172** |
 
 ---
 

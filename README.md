@@ -16,6 +16,8 @@ An ultra-complete tester that detects the most vicious bugs in your libft.
 ./alnok.sh --bonus
 ```
 
+**Note**: The script automatically runs an optional defensive NULL test at the end (without Valgrind/ASan) to check if your functions handle NULL parameters gracefully.
+
 ---
 
 ## 📊 What is Tested
@@ -37,6 +39,7 @@ An ultra-complete tester that detects the most vicious bugs in your libft.
 | `test_sneaky_bugs.c` | Classic bugs that often break |
 | `test_ultra_sneaky.c` | Ultra-sneaky expert-level tests |
 | `test_list_torture.c` | Linked list torture (bonus) |
+| `test_defensive_null.c` | 🛡️ Optional NULL handling tests (no Valgrind/ASan) |
 
 ---
 
