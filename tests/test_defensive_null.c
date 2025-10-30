@@ -17,32 +17,48 @@
 static int test_count = 0;
 static int pass_count = 0;
 static int fail_count = 0;
-static jmp_buf segfault_jmp;
+static sigjmp_buf segfault_jmp;
+static volatile sig_atomic_t in_test = 0;
 
 void segfault_handler(int sig) {
     (void)sig;
-    longjmp(segfault_jmp, 1);
+    if (in_test) {
+        in_test = 0;
+        siglongjmp(segfault_jmp, 1);
+    }
+    // If not in test, let it crash normally
+    signal(SIGSEGV, SIG_DFL);
+    raise(SIGSEGV);
 }
 
 #define TEST_NULL(name, code) do { \
     test_count++; \
-    signal(SIGSEGV, segfault_handler); \
-    if (setjmp(segfault_jmp) == 0) { \
+    fprintf(stderr, "[TEST %d/%d] %s\n", test_count, 13, name); \
+    fflush(stderr); \
+    struct sigaction sa, old_sa; \
+    sa.sa_handler = segfault_handler; \
+    sigemptyset(&sa.sa_mask); \
+    sa.sa_flags = 0; \
+    sigaction(SIGSEGV, &sa, &old_sa); \
+    in_test = 1; \
+    if (sigsetjmp(segfault_jmp, 1) == 0) { \
         code; \
+        in_test = 0; \
         printf("✅ PASS [%d]: %s - handled NULL correctly\n", test_count, name); \
         pass_count++; \
     } else { \
         printf("⚠️  FAIL [%d]: %s - segfault (NULL not handled)\n", test_count, name); \
         fail_count++; \
     } \
-    signal(SIGSEGV, SIG_DFL); \
+    in_test = 0; \
+    sigaction(SIGSEGV, &old_sa, NULL); \
 } while(0)
 
 int main(void)
 {
     printf("\n");
     printf("╔════════════════════════════════════════════════════════════════╗\n");
-    printf("║  🛡️  DEFENSIVE CODING TESTS - NULL PARAMETER HANDLING         ║\n");
+    printf("║  🛡️  DEFENSIVE CODING TESTS - NULL PARAMETER HANDLING           ║\n");
     printf("╚════════════════════════════════════════════════════════════════╝\n");
     printf("\n");
     printf("⚠️  These tests are OPTIONAL - the 42 subject does NOT require\n");
@@ -165,6 +181,12 @@ int main(void)
     printf("───────────────────────────────────────────────────────────────\n");
     printf("\n");
     
+    printf("📊 Test Summary:\n");
+    printf("   ✅ Passed: %d\n", pass_count);
+    printf("   ⚠️  Failed: %d\n", fail_count);
+    printf("   📝 Total:  %d\n", test_count);
+    printf("\n");
+    
     if (fail_count == 0) {
         printf("╔════════════════════════════════════════════════════════════════╗\n");
         printf("║  ✅ ALL DEFENSIVE TESTS PASSED (%d/%d)                         ║\n", pass_count, test_count);
@@ -186,6 +208,6 @@ int main(void)
         printf("💡 Tip: Add simple NULL checks at the start of your functions:\n");
         printf("   if (!s1 || !s2) return (NULL);\n");
         printf("\n");
-        return 0;  // Return 0 even on failure - these are optional tests
+        return 1;  // Return 1 to indicate failures
     }
 }

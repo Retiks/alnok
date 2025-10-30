@@ -11,6 +11,8 @@ static int fail_count = 0;
 
 #define TEST(name, cond) do { \
     test_count++; \
+    fprintf(stderr, "[TEST %d] %s\n", test_count, name); \
+    fflush(stderr); \
     if (!(cond)) { \
         fprintf(stderr, "❌ FAIL [%d]: %s\n", test_count, name); \
         fail_count++; \
