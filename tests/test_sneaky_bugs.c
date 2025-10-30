@@ -105,14 +105,16 @@ int main(void)
     
     s = ft_strjoin(NULL, NULL);
     TEST("strjoin NULL+NULL returns NULL (defensive)", s == NULL);
-    if (s) free(s)
+    if (s) free(s);
     
     // ========== ft_strtrim: Trim all and NULL ==========
     s = ft_strtrim("   ", " ");
     TEST("strtrim all spaces", s && strcmp(s, "") == 0);
+    free(s);
     
     s = ft_strtrim("abcabc", "abc");
     TEST("strtrim everything", s && strcmp(s, "") == 0);
+    free(s);
     
     s = ft_strtrim("xxxHELLOxxx", "x");
     TEST("strtrim both sides", s && strcmp(s, "HELLO") == 0);
@@ -189,10 +191,11 @@ int main(void)
     if (mapped) free(mapped);
     
     ft_striteri(NULL, NULL);
-    TEST("striteri with NULL doesn't crash (defensive)", 1)
+    TEST("striteri with NULL doesn't crash (defensive)", 1);
     
     // ========== ft_calloc: Zero size ==========
-    void *p = ft_calloc(0, 10);
+    void *p;
+    p = ft_calloc(0, 10);
     TEST("calloc(0, 10) returns non-NULL", p != NULL);
     free(p);
     
@@ -205,7 +208,7 @@ int main(void)
     TEST("strdup empty string", s && strcmp(s, "") == 0);
     free(s);
     
-    // ========== Résultat final ==========
+    // ========== Final result ==========
     if (fail_count == 0) {
         printf("test_sneaky_bugs: OK (%d tests passed) 🎯\n", test_count);
         return 0;
