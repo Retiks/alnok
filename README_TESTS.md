@@ -6,10 +6,21 @@
 
 ## 📊 Overview
 
-- **247 tests** in total
+- **Tests strictly following 42 subject requirements**
 - **5 specialized test files**
 - **Valgrind** + **AddressSanitizer/UBSan**
-- **9 critical bugs** detected and fixed
+- **Includes optional defensive coding tests** (clearly marked)
+
+### 🛡️ About Defensive Coding Tests
+
+Some tests check for NULL parameter handling and overflow protection. These are marked as **"defensive coding - optional"** because:
+
+- ✅ **Not required by subject** - Passing NULL is undefined behavior
+- ✅ **Good practice** - Prevents segfaults during evaluation
+- ✅ **Recommended but optional** - Won't cause a 0 if not implemented
+- ⚠️ **Subject rule**: "except for undefined behavior" - so segfaults on NULL are technically allowed
+
+**Our recommendation**: Implement these protections (they're just 1-2 lines) to show good coding practices.
 
 ---
 
@@ -35,31 +46,33 @@
 
 ## 📁 Test Structure
 
-### 1. **test_edge_cases.c** (46 tests)
-Tests for edge cases and extreme values.
+### 1. **test_edge_cases.c**
+Tests for edge cases following the subject requirements.
 
 #### Included tests:
-- **ft_atoi**: Overflow (INT_MAX+1, INT_MIN-1), complete whitespace, multiple signs
-- **ft_substr**: Start > strlen, len > strlen, start + len overflow
+- **ft_atoi**: Overflow behavior (matches libc), complete whitespace, multiple signs
+- **ft_substr**: Start > strlen, len > strlen, empty strings
 - **ft_split**: Multiple delimiters, empty string, single word
-- **ft_strjoin**: Empty strings, very long strings
+- **ft_strjoin**: Empty strings
 - **ft_strtrim**: Complete trim, empty set, special characters
 - **ft_strlcat**: Full buffer, dstsize = 0, dstsize < strlen(dst)
 - **ft_strnstr**: Empty needle, len = 0, needle at boundary
 - **ft_memchr**: Search '\0', after null, n = 0
-- **ft_calloc**: SIZE_MAX overflow, zero size
+- **ft_calloc**: Zero size behavior (returns valid pointer for free)
 - **ft_itoa**: INT_MIN, INT_MAX, 0
+
+**Note**: Overflow protection tests removed (not required). NULL tests included as optional defensive coding.
 
 ---
 
-### 2. **test_fd_edge_cases.c** (13 tests)
+### 2. **test_fd_edge_cases.c**
 Tests for writing functions with file descriptors.
 
 #### Included tests:
 - **Invalid FDs** : -1, 9999, closed FD
-- **NULL pointers** : ft_putstr_fd(NULL), ft_putendl_fd(NULL)
 - **Content verification** : Writing to temporary file
 - **Empty strings** : "", ft_putnbr_fd with 0, -1, INT_MIN, INT_MAX
+- **NULL tests** : ft_putstr_fd(NULL), ft_putendl_fd(NULL) - marked as optional defensive coding
 
 ---
 

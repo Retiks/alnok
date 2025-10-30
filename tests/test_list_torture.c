@@ -1,4 +1,4 @@
-// test_list_torture.c - Tests de torture pour les listes chaînées
+// test_list_torture.c - Torture tests for linked lists
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,7 +40,7 @@ void do_nothing(void *content) {
 
 int main(void)
 {
-    // ========== ft_lstnew: Tests basiques ==========
+    // ========== ft_lstnew: Tests basic ==========
     
     t_list *node = ft_lstnew(NULL);
     TEST("lstnew with NULL content", node != NULL && node->content == NULL && node->next == NULL);
@@ -52,7 +52,7 @@ int main(void)
     free(str);
     free(node);
     
-    // ========== ft_lstadd_front: Tests vicieux ==========
+    // ========== ft_lstadd_front: Tests sneaky ==========
     
     t_list *list = NULL;
     ft_lstadd_front(&list, ft_lstnew(strdup("3")));
@@ -68,7 +68,7 @@ int main(void)
     TEST("lstadd_front to NULL", list && strcmp(list->content, "first") == 0);
     ft_lstclear(&list, free);
     
-    // ========== ft_lstadd_back: Tests vicieux ==========
+    // ========== ft_lstadd_back: Tests sneaky ==========
     
     list = NULL;
     ft_lstadd_back(&list, ft_lstnew(strdup("1")));
@@ -85,7 +85,7 @@ int main(void)
     TEST("lstadd_back to NULL", list && strcmp(list->content, "only") == 0);
     ft_lstclear(&list, free);
     
-    // ========== ft_lstsize: Tests vicieux ==========
+    // ========== ft_lstsize: Tests sneaky ==========
     
     list = NULL;
     TEST("lstsize empty", ft_lstsize(list) == 0);
@@ -97,14 +97,14 @@ int main(void)
     ft_lstadd_back(&list, ft_lstnew(strdup("3")));
     TEST("lstsize three", ft_lstsize(list) == 3);
     
-    // Liste très longue
+    // Very long list
     for (int i = 0; i < 100; i++) {
         ft_lstadd_back(&list, ft_lstnew(strdup("x")));
     }
     TEST("lstsize 103", ft_lstsize(list) == 103);
     ft_lstclear(&list, free);
     
-    // ========== ft_lstlast: Tests vicieux ==========
+    // ========== ft_lstlast: Tests sneaky ==========
     
     list = NULL;
     TEST("lstlast empty", ft_lstlast(list) == NULL);
@@ -118,21 +118,21 @@ int main(void)
     TEST("lstlast next is NULL", last->next == NULL);
     ft_lstclear(&list, free);
     
-    // ========== ft_lstdelone: Tests vicieux ==========
+    // ========== ft_lstdelone: Tests sneaky ==========
     
     free_count = 0;
     node = ft_lstnew(strdup("delete_me"));
     ft_lstdelone(node, count_del);
     TEST("lstdelone calls del", free_count == 1);
     
-    // lstdelone avec del = NULL (ne doit pas crash, mais leak)
+    // lstdelone with del = NULL (should not crash, but leak)
     node = ft_lstnew(strdup("leak"));
     char *leaked_content = node->content;
     ft_lstdelone(node, NULL);
     TEST("lstdelone with NULL del doesn't crash", 1);
-    free(leaked_content);  // On nettoie le content manuellement
+    free(leaked_content);  // We manually free the content
     
-    // ========== ft_lstclear: Tests vicieux ==========
+    // ========== ft_lstclear: Tests sneaky ==========
     
     free_count = 0;
     list = NULL;
@@ -148,7 +148,7 @@ int main(void)
     ft_lstclear(&list, free);
     TEST("lstclear empty list", list == NULL);
     
-    // lstclear avec liste très longue
+    // lstclear with very long list
     free_count = 0;
     list = NULL;
     for (int i = 0; i < 1000; i++) {
@@ -157,14 +157,14 @@ int main(void)
     ft_lstclear(&list, count_del);
     TEST("lstclear 1000 nodes", free_count == 1000 && list == NULL);
     
-    // ========== ft_lstiter: Tests vicieux ==========
+    // ========== ft_lstiter: Tests sneaky ==========
     
     list = NULL;
     ft_lstadd_back(&list, ft_lstnew(strdup("a")));
     ft_lstadd_back(&list, ft_lstnew(strdup("b")));
     ft_lstadd_back(&list, ft_lstnew(strdup("c")));
     
-    // lstiter avec fonction qui ne fait rien
+    // lstiter with function that does nothing
     ft_lstiter(list, do_nothing);
     TEST("lstiter do_nothing doesn't crash", 1);
     
@@ -175,7 +175,7 @@ int main(void)
     
     ft_lstclear(&list, free);
     
-    // ========== ft_lstmap: Tests ultra-vicieux ==========
+    // ========== ft_lstmap: Tests ultra-sneaky ==========
     
     // lstmap normal
     malloc_count = 0;
@@ -192,7 +192,7 @@ int main(void)
     ft_lstclear(&list, free);
     ft_lstclear(&mapped, free);
     
-    // lstmap avec échec au milieu
+    // lstmap with failure in middle
     list = NULL;
     ft_lstadd_back(&list, ft_lstnew(strdup("1")));
     ft_lstadd_back(&list, ft_lstnew(strdup("2")));
@@ -203,19 +203,19 @@ int main(void)
     
     ft_lstclear(&list, free);
     
-    // lstmap sur liste vide
+    // lstmap on an empty list
     list = NULL;
     mapped = ft_lstmap(list, count_dup, free);
     TEST("lstmap empty list returns NULL", mapped == NULL);
     
-    // lstmap avec liste d'un seul élément
+    // lstmap with single element list
     list = ft_lstnew(strdup("single"));
     mapped = ft_lstmap(list, count_dup, free);
     TEST("lstmap single element", mapped && strcmp(mapped->content, "single") == 0 && mapped->next == NULL);
     ft_lstclear(&list, free);
     ft_lstclear(&mapped, free);
     
-    // lstmap avec liste très longue
+    // lstmap with very long list
     list = NULL;
     for (int i = 0; i < 100; i++) {
         ft_lstadd_back(&list, ft_lstnew(strdup("x")));
@@ -225,9 +225,9 @@ int main(void)
     ft_lstclear(&list, free);
     ft_lstclear(&mapped, free);
     
-    // ========== Tests de cohérence ==========
+    // ========== Tests of consistency ==========
     
-    // Vérifier que lstadd_front + lstlast fonctionne
+    // Verify that lstadd_front + lstlast works
     list = NULL;
     ft_lstadd_front(&list, ft_lstnew(strdup("first")));
     ft_lstadd_back(&list, ft_lstnew(strdup("last")));
@@ -236,7 +236,7 @@ int main(void)
     TEST("front+back last", strcmp(last->content, "last") == 0);
     ft_lstclear(&list, free);
     
-    // Vérifier que lstsize est cohérent avec lstlast
+    // Verify that lstsize is consistent with lstlast
     list = NULL;
     for (int i = 0; i < 50; i++) {
         ft_lstadd_back(&list, ft_lstnew(strdup("x")));
@@ -245,7 +245,7 @@ int main(void)
     last = ft_lstlast(list);
     TEST("size and last consistency", size == 50 && last != NULL);
     
-    // Parcourir manuellement et compter
+    // Manually traverse and count
     int manual_count = 0;
     t_list *tmp = list;
     while (tmp) {
@@ -256,9 +256,9 @@ int main(void)
     
     ft_lstclear(&list, free);
     
-    // ========== Tests de robustesse ==========
+    // ========== Tests of robustness ==========
     
-    // Créer une liste, la clear, puis réutiliser le pointeur
+    // Create a list, clear it, then reuse the pointer
     list = ft_lstnew(strdup("test"));
     ft_lstclear(&list, free);
     TEST("list is NULL after clear", list == NULL);
@@ -266,7 +266,7 @@ int main(void)
     TEST("can reuse cleared list", list && strcmp(list->content, "new") == 0);
     ft_lstclear(&list, free);
     
-    // ========== Résultat final ==========
+    // ========== Final result ==========
     if (fail_count == 0) {
         printf("test_list_torture: OK (%d tests passed) 💀⛓️💀\n", test_count);
         return 0;
