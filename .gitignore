@@ -1,0 +1,51 @@
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+a.out
+
+# Test binaries
+tests/run_test_*
+tests/test_*_valgrind
+tests/test_*_asan
+
+# Temporary test files
+/tmp/test_libft_*
+
+# libft source files (if you copy libft into this directory)
+ft_*.c
+libft.h
+Makefile
+
+# Bonus files
+*_bonus.c
+*_bonus.h
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Dependency files
+*.d
+
+# Core dumps
+core
+core.*
+vgcore.*
